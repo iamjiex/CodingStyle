@@ -1,4 +1,6 @@
-（整理自 [http://www.cppblog.com/kesalin/archive/2011/11/03/coding_guideline_of_cocoa.html](http://www.cppblog.com/kesalin/archive/2011/11/03/coding_guideline_of_cocoa.html)）
+大部分译文来自 [http://www.cppblog.com/kesalin/archive/2011/11/03/coding_guideline_of_cocoa.html](http://www.cppblog.com/kesalin/archive/2011/11/03/coding_guideline_of_cocoa.html)
+
+英文原文请查看Coding Guidelines for Cocoa命名部分[https://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html](https://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html)
 
 #代码命名基础
 
