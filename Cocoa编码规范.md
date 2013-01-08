@@ -182,3 +182,88 @@ NSObject 协议就是这样一个例子。这个协议组合一组彼此无关�
 如果方法描述两种独立的行为，使用 and 来串接它们。
 
 	- (BOOL) openFile:(NSString *)fullPath withApplication:(NSString *)appName andDeactivate:(BOOL)flag;         NSWorkspace
+
+##Accessor Methods 访问方法
+
+访问方法是对象属性的读取与设置方法。其命名有特定的格式依赖于属性的描述内容。
+
+如果属性是用名词描述的，则命名格式为：
+
+\- (type) noun;
+
+\- (void) setNoun:(type)aNoun;
+
+例如：
+
+	- (NSString *)title;
+	- (void)setTitle:(NSString *)aTitle;
+
+如果属性是用形容词描述的，则命名格式为：
+
+\- (BOOL) isAdjective;
+
+\- (void) setAdjective:(BOOL)flag;
+
+例如：
+
+	- (BOOL) isEditable;
+	- (void) setEditable:(BOOL)flag;
+
+如果属性是用动词描述的，则命名格式为：（动词要用现在时时态）
+
+\- (BOOL) verbObject;
+
+\- (void) setVerbObject:(BOOL)flag;
+
+例如：
+
+	- (BOOL) showsAlpha;
+	- (void) setShowAlpha:(BOOL)flag;
+
+不要使用动词的过去分词形式作形容词使用
+
+	- (void) setAcceptsGlyphInfo:(BOOL)flag;            对
+	- (BOOL) acceptsGlyphInfo;                          对
+	- (void) setGlyphInfoAccepted:(BOOL)flag;           错
+	- (BOOL) glyphInfoAccepted;                         错
+
+可以使用情态动词（can, should, will 等）来提高清晰性，但不要使用 do 或 does
+
+	- (void) setCanHide:(BOOL)flag;                      对
+	- (BOOL) canHide;                                    对
+	- (void) setShouldCloseDocument:(BOOL)flag;          对
+	- (void) shouldCloseDocument;                        对
+	- (void) setDoseAcceptGlyphInfo:(BOOL)flag;          错
+	- (BOOL) doseAcceptGlyphInfo;                        错
+
+只有在方法需要间接返回多个值的情况下，才使用 get
+
+	- (void) getLineDash:(float *)pattern count:(int *)count phase:(float *)phase;                           NSBezierPath.
+
+像上面这样的方法，在其实现里应允许接受 NULL 作为其 in/out 参数，以表示调用者对一个或多个返回值不感兴趣。
+
+##Delegate Methods 委托方法
+
+委托方法是那些在特定事件发生时可被对象调用，并声明在对象的委托类中的方法。它们有独特的命名约定，这些命名约定同样也适用于对象的数据源方法。
+
+名称以标示发送消息的对象的类名开头，省略类名的前缀并小写类第一个字符
+
+	- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
+	- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename;
+
+冒号紧跟在类名之后（随后的那个参数表示委派的对象）。该规则不适用于只有一个 sender 参数的方法
+
+	- (BOOL) applicationOpenUntitledFile:(NSApplication *)sender;
+
+上面的那条规则也不适用于响应通知的方法。在这种情况下，方法的唯一参数表示通知对象
+
+	- (void) windowDidChangeScreen:(NSNotification *)notification;
+
+用于通知委托对象操作即将发生或已经发生的方法名中要使用 did 或 will
+
+	- (void) browserDidScroll:(NSBrowser *)sender;
+	- (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window;
+
+用于询问委托对象可否执行某操作的方法名中可使用 did 或 will，但最好使用 should
+
+	- (BOOL) windowShouldClose:(id)sender;
