@@ -52,7 +52,7 @@
 
 ###No Self Reference 不要自我指涉
 
-不要名称自我指涉。
+名称中不要重复自己的类型。
 
 	代码                              点评
 	NSString                         okay
@@ -132,7 +132,7 @@ NSObject 协议就是这样一个例子。这个协议组合一组彼此无关�
 	头文件                          框架
 	Foundation.h                   Foundation.framework
 
-为已有框架中的某个类扩展 API：如果要在一个框架中声明属于另一个框架某个类的范畴类的方法，该头文件的命名形式为：原类名+“Additions”。如 Application Kit 中的 NSBundleAdditions.h。
+为已有框架中的某个类扩展 API：如果要在一个框架中声明属于另一个框架中的某个类的Category方法，该头文件的命名形式为：原类名+“Additions”。如 Application Kit 中的 NSBundleAdditions.h。
 
 相关联的函数与数据类型：将相联的函数，常量，结构体以及其他数据类型放置到一个头文件中，并以合适的名字命名。如 Application Kit 中的 NSGraphics.h。
 
@@ -420,8 +420,10 @@ Objective-C 允许通过函数（C形式的函数）描述行为，就如成员�
 
 合成（synthesize）属性和实例变量时，要在 @synthesize 语句指定实例变量的名称：
 
-	@implementation MyClass	@synthesize showsTitle=_showsTitle;
-当为类增加实例变量时，需要考虑一下情况：
+	@implementation MyClass
+	@synthesize showsTitle=_showsTitle;
+
+当为类增加实例变量时，需要考虑一下情况：
 
 不要显式地声明一个公开的实例变量（public instance variables）。开发者需要关心对象的接口，而不是它的内部储存方式。应该使用属性并合成（synthesize）对应的实例变量。
 
