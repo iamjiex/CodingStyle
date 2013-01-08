@@ -220,14 +220,14 @@ NSObject 协议就是这样一个例子。这个协议组合一组彼此无关�
 	- (BOOL) showsAlpha;
 	- (void) setShowAlpha:(BOOL)flag;
 
-不要使用动词的过去分词形式作形容词使用
+不要使用动词的过去分词形式作形容词使用。
 
 	- (void) setAcceptsGlyphInfo:(BOOL)flag;            对
 	- (BOOL) acceptsGlyphInfo;                          对
 	- (void) setGlyphInfoAccepted:(BOOL)flag;           错
 	- (BOOL) glyphInfoAccepted;                         错
 
-可以使用情态动词（can, should, will 等）来提高清晰性，但不要使用 do 或 does
+可以使用情态动词（can, should, will 等）来提高清晰性，但不要使用 do 或 does。
 
 	- (void) setCanHide:(BOOL)flag;                      对
 	- (BOOL) canHide;                                    对
@@ -236,7 +236,7 @@ NSObject 协议就是这样一个例子。这个协议组合一组彼此无关�
 	- (void) setDoseAcceptGlyphInfo:(BOOL)flag;          错
 	- (BOOL) doseAcceptGlyphInfo;                        错
 
-只有在方法需要间接返回多个值的情况下，才使用 get
+只有在方法需要间接返回多个值的情况下，才使用 get。
 
 	- (void) getLineDash:(float *)pattern count:(int *)count phase:(float *)phase;                           NSBezierPath.
 
@@ -246,24 +246,323 @@ NSObject 协议就是这样一个例子。这个协议组合一组彼此无关�
 
 委托方法是那些在特定事件发生时可被对象调用，并声明在对象的委托类中的方法。它们有独特的命名约定，这些命名约定同样也适用于对象的数据源方法。
 
-名称以标示发送消息的对象的类名开头，省略类名的前缀并小写类第一个字符
+名称以标示发送消息的对象的类名开头，省略类名的前缀并小写类第一个字符。
 
 	- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 	- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename;
 
-冒号紧跟在类名之后（随后的那个参数表示委派的对象）。该规则不适用于只有一个 sender 参数的方法
+冒号紧跟在类名之后（随后的那个参数表示委派的对象）。该规则不适用于只有一个 sender 参数的方法。
 
 	- (BOOL) applicationOpenUntitledFile:(NSApplication *)sender;
 
-上面的那条规则也不适用于响应通知的方法。在这种情况下，方法的唯一参数表示通知对象
+上面的那条规则也不适用于响应通知的方法。在这种情况下，方法的唯一参数表示通知对象。
 
 	- (void) windowDidChangeScreen:(NSNotification *)notification;
 
-用于通知委托对象操作即将发生或已经发生的方法名中要使用 did 或 will
+用于通知委托对象操作即将发生或已经发生的方法名中要使用 did 或 will。
 
 	- (void) browserDidScroll:(NSBrowser *)sender;
 	- (NSUndoManager *) windowWillReturnUndoManager:(NSWindow *)window;
 
-用于询问委托对象可否执行某操作的方法名中可使用 did 或 will，但最好使用 should
+用于询问委托对象可否执行某操作的方法名中可使用 did 或 will，但最好使用 should。
 
 	- (BOOL) windowShouldClose:(id)sender;
+
+##Collection Methods 集合方法
+
+管理对象（集合中的对象被称之为元素）的集合类，约定要具备如下形式的方法：
+
+\- (void) addElement:(elementType)adObj;
+
+\- (void) removeElement:(elementType)anObj;
+
+\- (NSArray *)elements;
+
+例如：
+
+	- (void) addLayoutManager:(NSLayoutManager *)adObj;
+	- (void) removeLayoutManager:(NSLayoutManager *)anObj;
+	- (NSArray *)layoutManagers;
+
+集合方法命名有如下一些限制和约定：
+
+如果集合中的元素无序，返回 NSSet，而不是 NSArray。
+
+如果将元素插入指定位置的功能很重要，则需具备如下方法：
+
+	- (void)insertLayoutManager:(NSLayoutManager *)obj atIndex:(int)index;
+	- (void)removeLayoutManagerAtIndex:(int)index;
+
+集合方法的实现要考虑如下细节：
+
+以上集合类方法通常负责管理元素的所有者关系，在 add 或 insert 的实现代码里会 retain 元素，在 remove 的实现代码中会 release 元素。
+
+当被插入的对象需要持有指向集合对象的指针时，通常使用 set... 来命名其设置该指针的方法，且不要 retain 集合对象。比如上面的 insertLayerManager:atIndex: 这种情形，NSLayoutManager 类使用如下方法：
+
+	- (void) setTextStorage:(NSTextStorage *)textStorage;
+	- (NSTextStorage *)textStorage;
+
+通常你不会直接调用 setTextStorage:，而是覆写它。
+
+另一个关于集合约定的例子来自 NSWindow 类：
+
+	- (void) addChildWindow:(NSWindow *)childWin ordered:(NSWindowOrderingMode)place;
+	- (void) removeChildWindow:(NSWindow *)childWin;
+	- (NSArray *)childWindows;
+	- (NSWindow *) parentWindow;
+	- (void) setParentWindow:(NSWindow *)window;
+
+##Method Arguments 方法参数
+
+命名方法参数时要考虑如下规则：
+
+如同方法名，参数名小写第一个单词的首字符，大写后继单词的首字符。如：removeObject:(id)anObject 。
+
+不要在参数名中使用 pointer 或 ptr，让参数的类型来说明它是指针。
+
+参数名不要只有一个或两个字母。
+
+避免为节省几个字符而缩写。
+
+按照 Cocoa 惯例，以下关键字与参数联合使用：
+
+	...action:(SEL)aSelector
+	...alignment:(int)mode
+	...atIndex:(int)index
+	...content:(NSRect)aRect
+	...doubleValue:(double)aDouble
+	...floatValue:(float)aFloat
+	...font:(NSFont *)fontObj
+	...frame:(NSRect)frameRect
+	...intValue:(int)anInt
+	...keyEquivalent:(NSString *)charCode
+	...length:(int)numBytes
+	...point:(NSPoint)aPoint
+	...stringValue:(NSString *)aString
+	...tag:(int)anInt
+	...target:(id)anObject
+	...title:(NSString *)aString
+
+##Private Methods 私有方法
+
+大多数情况下，私有方法命名相同与公共方法命名约定相同，但通常我们约定给私有方法添加前缀，以便与公共方法区分开来。即使这样，私有方法的名称很容易导致特别的问题。当你设计一个继承自 Cocoa framework 某个类的子类时，你无法知道你的私有方法是否不小心覆盖了框架中基类的同名方法。
+
+Cocoa framework 的私有方法名称通常以下划线作为前缀（如：_fooData），以标示其私有属性。基于这样的事实，遵循以下两条建议：
+
+不要使用下划线作为你自己的私有方法名称的前缀，Apple 保留这种用法。
+
+若要继承 Cocoa framework 中一个超大的类（如：NSView），并且想要使你的私有方法名称与基类中的区别开来，你可以为你的私有方法名称添加你自己的前缀。这个前缀应该具有唯一性，如基于你公司的名称，或工程的名称，并以“XX_”形式给出。比如你的工程名为"Byte Flogger"，那么就可以是“BF_addObject:”。
+
+尽管为私有方法名称添加前缀的建议与前面类中方法命名的约定冲突，这里的意图有所不同：为了防止不小心地覆盖基类中的私有方法。
+
+#Naming Functions 函数命名
+
+Objective-C 允许通过函数（C形式的函数）描述行为，就如成员方法一样。 你应当优先使用函数，而不是类方法，如果隐含的类为单例或在处理函数子系统时。
+
+函数命名应该遵循如下几条规则：
+
+函数命名与方法命名相似，但有几点不同：
+
+它们有前缀，其前缀与你使用的类和常量的前缀相同。
+
+大写前缀后紧跟的第一个单词首字符要大写。
+
+大多数函数名称以动词开头，这个动词描述该函数的行为：
+
+	NSHighlightRect
+	NSDeallocateObject
+
+查询属性的函数有更多的规则要遵循：
+
+查询第一个参数的属性的函数，省略动词：
+
+	unsigned int NSEventMaskFromType(NSEventType type)
+	float NSHeight(NSRect rect)
+
+返回值为引用的方法，使用 Get：
+
+	const char *NSGetSizeAndAlignment(const char *typePtr, unsigned int *sizep, unsigned int *alignp)
+
+返回布尔值类型的函数，名称使用判断动词 is/does 开头：
+
+	BOOL NSDecimalIsNotANumber(const NSDecimal *decimal)
+
+#Naming Properties and Data Types 属性和数据类型的命名
+
+本小节描述了属性、实例变量、常量、通知和异常的命名约定。
+
+##Declared Properties and Instance Variables 属性和实例变量
+
+属性声明了访问方法，因此对属性的命名约定和访问方法的命名大致相同（参考访问方法部分）。
+
+当属性是名词或动词时，格式如下：
+
+@property (...) typenounOrVerb;
+
+例如：
+
+	@property (strong) NSString *title;
+	@property (assign) BOOL showsAlpha;
+
+当属性是形容词时，尽管属性名称会忽略 “is” 前缀，你仍需为读取访问方法（get accessor）设置一个习惯上的名称，例如：
+
+	@property (assign, getter=isEditable) BOOL editable;
+
+大多数情况下，在声明了一个属性后，也要合成（synthesize）对应的实例变量。
+
+确保实例变量的名字要简洁地描述出对象的特征。通常情况下，不要直接访问实例变量，要使用访问方法（accessor methods），但是在init和dealloc方法内必须直接访问实例变量。为了表示实例变量，实例变量使用下划线前缀，例如：
+
+	@implementation MyClass {
+	    BOOL _showsTitle;
+	}
+
+合成（synthesize）属性和实例变量时，要在 @synthesize 语句指定实例变量的名称：
+
+	@implementation MyClass	@synthesize showsTitle=_showsTitle;
+当为类增加实例变量时，需要考虑一下情况：
+
+不要显式地声明一个公开的实例变量（public instance variables）。开发者需要关心对象的接口，而不是它的内部储存方式。应该使用属性并合成（synthesize）对应的实例变量。
+
+声明一个实例变量时，尽量使用 @private 或 @protected 来声明它们。当你希望对象的实例变量需要被它的子类直接访问时，使用 @protected 。
+
+当实例变量是被作为类的特性（attribute）时，确保为这个实例变量提供访问方法（accessor method），最好用属性来实现。
+
+##Constants 常量
+
+常量命名规则根据常量创建的方式不同而大不同。
+
+###枚举常量
+
+使用枚举来定义一组相关的整数常量。
+
+枚举常量与其 typedef 命名遵守函数命名规则。如：来自 NSMatrix.h 中的例子：（本例中的 typedef tag（_NSMatrixMode）不是必须的）
+
+	typedef enum _NSMatrixMode {
+	    NSRadioModeMatrix       = 0,
+	    NSHighlightModeMatrix = 1;
+	    NSListModeMatrix           = 2,
+	    NSTrackModeMatrix        = 3
+	} NSMatrixMode;
+
+位掩码常量可以使用不具名枚举。如：
+
+	enum {
+	    NSBorderlessWindowMask         = 0,
+	    NSTitledWindowMask                 = 1 << 0,
+	    NSClosableWindowMask            = 1 << 1,
+	    NSMiniaturizableWindowMask  = 1 << 2,
+	    NSResizableWindowMask          = 1 << 3
+	};
+
+###Constants created with const 用const创建的常量
+
+使用 const 来修饰浮点常量或彼此没有关联的整数常量，其他情况使用枚举常量。
+
+枚举常量命名规则与函数命名规则相同。const 常量命名范例：
+
+	const float NSLightGray;
+
+###其他常量
+
+通常不使用 #define 来创建常量。如上面所述，整数常量请使用枚举，浮点数常量请使用 const。
+
+使用大写字母来定义预处理编译宏。如：
+
+	#ifdef DEBUG
+
+编译器定义的宏名首尾都有双下划线。如：
+
+	__MACH__
+
+为 notification 名及 dictionary key 定义字符串常量，从而能够利用编译器的拼写检查，减少书写错误。Cocoa框架提供了很多这样的范例：
+
+	APPKIT_EXTERN NSString *NSPrintCopies;
+
+实际的字符串值在实现文件中赋予。（注意：APPKIT_EXTERN 宏等价于Objective-C 中 extern）
+
+##Notifications and Exceptions 通知与异常
+
+通知与异常的命名遵循相似的规则，但是它们有各自推荐的使用模式。
+
+###通知
+
+如果一个类有委托（delegate），那它的大部分通知可能由其委托的委托方法来处理。这些通知的名称应该能够反应其响应的委托方法。比如，当应用程序提交 NSApplicationDidBecomeActiveNotification 通知时，全局 NSApplication 对象的委托会注册从而能够接收 applicaitonDidBecomeActive: 消息。
+
+通知由具有如下形式的全局 NSString 对象标识：
+
+	[相关联类的名称] + [Did 或 Will] + [UniquePartOfName] + Notification
+
+例如：
+
+	NSApplicationDidBecomeActiveNotification
+	NSWindowDidMiniaturizeNotification
+	NSTextViewDidChangeSelectionNotification
+	NSColorPanelColorDidChangeNotification
+
+###异常
+
+虽然你可以处于任何目的而使用异常（由 NSException 类及相关类实现），Cocoa 通常不使用异常来处理常规的，可预料的错误。在这些情形下，使用诸如 nil, NULL, NO或错误代码之类的返回值。异常的典型应用类似数组越界之类的编程错误。
+
+异常由具有如下形式的全局 NSString 对象标识：
+
+	[Prefix] + [UniquePartOfName] + Exception
+
+UniquePartOfName 部分是有连续的首字符大写的单词组成。例如：
+
+	NSColorListIOException
+	NSColorListNotEditableException
+	NSDraggingException
+	NSFontUnavailableException
+	NSIllegalSelectorException
+
+#Acceptable Abbreviations and Acronyms 可接受的缩略语
+
+设计编程接口时，通常名称不要缩写。然而，下面列出的缩写要么是固定下来的要么是过去被广泛使用的，所以你可以继续使用。关于缩写有一些额外的注意事项：
+
+标准 C 库中长期使用的缩写形式是可以接受的。如："alloc"，"getc"。
+
+你可以在参数名中更自由地使用缩写。如：imageRep，col（column），obj，otherWin。
+
+常见的缩写：
+
+	缩写                   意义
+	alloc                 分配（allocate）
+	alt                   替代者（alternate）
+	app                   应用程序（application）。例如NSApp是全局的应用程序对象， “application”用在委托方法（delegate methods）、通知中。
+	calc                  计算（calculate）
+	dealloc               解除分配（deallocate）
+	func                  函数（function）
+	horiz                 水平线（horizontal）
+	info                  信息（information）
+	init                  初始化（initialize），用于初始化新建的对象的方法
+	int                   整数（integer），在C语言用int，当用在一个NSInteger类型的变量时，使用integer
+	max                   最大的（maximum）
+	min                   最小的（minimum）
+	msg                   消息（message）
+	nib                   Interface Builder文件
+	pboard                粘贴板（pasteboard），只用于常量
+	rect                  矩形（rectangle）
+	Rep                   表现（Representation），用于类的名称，例如 NSBitmapImageRep
+	temp                  临时的（temporary）
+	vert                  垂直的（vetical）
+
+你可以使用一些在计算机产业上常见的单词。以下是一些有名的缩写：
+
+	ASCII
+	PDF
+	XML
+	HTML
+	URL
+	RTF
+	HTTP
+	TIFF
+	JPG
+	PNG
+	GIF
+	LZW
+	ROM
+	RGB
+	CMYK
+	MIDI
+	FTP
+
